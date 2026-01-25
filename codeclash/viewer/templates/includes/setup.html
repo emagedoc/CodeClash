@@ -1,0 +1,44 @@
+<!-- Setup Section -->
+<section class="setup-section">
+    <h2><i class="bi bi-gear"></i> Setup</h2>
+
+    <!-- Agent Information -->
+    <div class="agent-info">
+        {% if metadata.agent_info %}
+            <div class="agents-grid">
+                {% for agent in metadata.agent_info %}
+                    <div class="agent-card">
+                        <div class="agent-name">{{ agent.name }}</div>
+                        {% if agent.model_name %}
+                            <div class="agent-model">Model: {{ agent.model_name|strip_model_prefix }}</div>
+                        {% endif %}
+                        {% if agent.agent_class %}
+                            <div class="agent-class">Class: {{ agent.agent_class }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No agent information available</p>
+        {% endif %}
+    </div>
+
+    <!-- Metadata Foldout -->
+    <details class="foldout">
+        <summary>
+            <i class="bi bi-clipboard"></i> Metadata
+            {% if metadata.metadata_file_path %}
+            <button class="btn btn-outline-secondary btn-sm copy-path-btn-small" data-path="{{ metadata.metadata_file_path }}" title="Copy metadata file path">
+                <i class="bi bi-clipboard"></i> Copy path
+            </button>
+            <button class="btn btn-outline-secondary btn-sm download-btn-small" data-path="{{ metadata.metadata_file_path }}" title="Download metadata file">
+                <i class="bi bi-download"></i> Download
+            </button>
+            {% endif %}
+        </summary>
+        <div class="metadata-display">
+            <div id="metadata-jsoneditor" class="json-viewer"></div>
+        </div>
+    </details>
+
+</section>

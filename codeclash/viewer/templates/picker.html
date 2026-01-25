@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick Game - CodeClash Trajectory Viewer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/picker.css') }}">
+</head>
+<body{% if is_static %} data-static-mode{% endif %}>
+    {% include 'includes/picker_header.html' %}
+
+    <main class="container-fluid main-content">
+        {% if game_folders %}
+        <div class="filter-container">
+            <label for="folder-filter">Folder:</label>
+            <select id="folder-filter" onchange="applyFilters()" class="filter-select">
+                {% for folder in unique_folders %}
+                <option value="{{ folder }}">{{ folder if folder else "(root)" }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="text" id="name-filter" oninput="applyFilters()" class="filter-input" placeholder="Filter by name...">
+
+            <select id="game-filter" onchange="applyFilters()" class="filter-select">
+                <option value="">All Games</option>
+            </select>
+
+            <select id="rounds-filter" onchange="applyFilters()" class="filter-select">
+                <option value="">All status</option>
+                <option value="complete">Complete</option>
+                <option value="incomplete">Incomplete</option>
+            </select>
+
+            <div class="model-filter-container">
+                <div class="model-filter-dropdown" id="model-filter-dropdown">
+                    <button class="model-filter-button" id="model-filter-button" onclick="toggleModelDropdown(event)">
+                        <span id="model-filter-display">All Models</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </button>
+                    <div class="model-filter-options" id="model-filter-options" style="display: none;">
+                        <div class="model-filter-clear">
+                            <button onclick="clearModelSelection(event)">Clear selection</button>
+                        </div>
+                        <div id="model-filter-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="active-filters-container" class="active-filters-container" style="display: none;">
+                <span class="filter-label">Active filters:</span>
+                <span id="date-filter-badge" class="filter-badge" style="display: none;">
+                    <i class="bi bi-calendar"></i>
+                    <span id="date-filter-text"></span>
+                    <button class="filter-badge-close" onclick="clearDateFilter(event)" title="Clear date filter">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </span>
+            </div>
+            <button id="clear-filters" onclick="clearFilters()" title="Clear all filters">
+                <i class="bi bi-x-circle"></i> Clear Filters
+            </button>
+            <div class="filter-spacer"></div>
+            {% if not is_static %}
+            <button class="bulk-actions-button" onclick="openBulkActionsModal()">
+                <i class="bi bi-lightning-charge"></i> Bulk Actions
+            </button>
+            {% endif %}
+        </div>
+
+        <div id="runs-status" class="runs-status"></div>
+
+        <div class="games-table">
+        <div class="table-header">
+            <div class="checkbox-header">
+                <input type="checkbox" id="select-all" class="game-checkbox" onchange="toggleSelectAll(this)" title="Toggle all" {% if is_static %}disabled{% endif %}>
+            </div>
+            <div class="sortable-header" onclick="sortTable('name')">
+                Name <i class="bi bi-arrow-down-up"></i>
+            </div>
+            <div class="sortable-header" onclick="sortTable('date')">
+                <i class="bi bi-calendar"></i> Date <i class="bi bi-arrow-down-up"></i>
+            </div>
+            <div>Game</div>
+            <div><i class="bi bi-target"></i> Rounds</div>
+            <div>Models</div>
+        </div>
+            {% for game in game_folders %}
+            {% set folder_name = game.name.split('/')[-1] %}
+            <div class="game-row game-folder"
+                 data-path="{{ game.name }}"
+                 data-parent-folder="{{ game.parent_folder or '' }}"
+                 data-timestamp="{{ game.created_timestamp or '' }}"
+                 data-aws-command="{{ game.aws_command or '' }}"
+                 onclick="handleRowClick(event, '{{ game.name }}')">
+
+                <div class="checkbox-cell">
+                    <input type="checkbox" class="game-checkbox" data-path="{{ game.name }}"
+                           onclick="event.stopPropagation()" {% if is_static %}disabled{% endif %}>
+                </div>
+
+                <div class="session-name-cell">
+                    <span class="game-name">{{ folder_name }}</span>
+                </div>
+
+                <div class="date-cell">
+                    {% if game.created_timestamp %}
+                    <span class="date-text clickable-filter" onclick="handleDateClick(event, '{{ game.created_timestamp|format_timestamp }}')" title="Click to filter by this date">{{ game.created_timestamp|format_timestamp }}</span>
+                    {% else %}
+                    <span class="date-unknown">-</span>
+                    {% endif %}
+                </div>
+
+                <div class="game-name-cell">
+                    {% if game.game_name %}
+                    <span class="game-name-text clickable-filter" onclick="handleGameNameClick(event, '{{ game.game_name }}')" title="Click to filter by this game">{{ game.game_name }}</span>
+                    {% else %}
+                    <span class="game-name-empty">-</span>
+                    {% endif %}
+                </div>
+
+                <div class="rounds-cell">
+                    {% if game.round_info %}
+                    <span class="rounds-count{% if game.round_info[0] < game.round_info[1] %} rounds-count-warning{% endif %}">{{ game.round_info[0] }}/{{ game.round_info[1] }}</span>
+                    {% else %}
+                    <span class="rounds-unknown">?</span>
+                    {% endif %}
+                </div>
+
+                <div class="models-cell">
+                    {% if game.models %}
+                        {% for model in game.models %}
+                        <span class="model-tag clickable-filter" onclick="handleModelTagClick(event, '{{ model|strip_model_prefix }}')" title="Click to filter by this model">{{ model|strip_model_prefix }}</span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="models-unknown">-</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-games-message">
+            <h3>No Game Sessions Found</h3>
+            <p>No folders containing <code>metadata.json</code> were found in the base directory.</p>
+            <p>Make sure you have run some games and they have generated log files.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    {% if not is_static %}
+    <!-- Bulk Actions Modal -->
+    <div id="bulk-actions-modal" class="modal-overlay" onclick="closeBulkActionsModalOnOverlay(event)" style="display: none;">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>Bulk Actions</h2>
+                <button class="modal-close" onclick="closeBulkActionsModal()" title="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-action-btn" onclick="fillTextareaWithPaths()">
+                    <i class="bi bi-folder"></i> Paths
+                </button>
+                <button class="modal-action-btn" onclick="fillTextareaWithFoldernames()">
+                    <i class="bi bi-tag"></i> Folder Names
+                </button>
+                {% if not is_static %}
+                <button class="modal-action-btn" onclick="fillTextareaWithS3RmCommands()">
+                    <i class="bi bi-trash"></i> S3 rm
+                </button>
+                <button class="modal-action-btn" onclick="fillTextareaWithAWSResubmitCommands()">
+                    <i class="bi bi-arrow-repeat"></i> AWS resubmit
+                </button>
+                <button class="modal-action-btn" onclick="fillTextareaWithGuessedConfigNames()">
+                    <i class="bi bi-file-earmark-text"></i> Guess config file name
+                </button>
+                <button class="modal-action-btn" onclick="fillTextareaWithAWSSubmitCommands()">
+                    <i class="bi bi-cloud-upload"></i> Guess AWS submit cmd
+                </button>
+                {% endif %}
+            </div>
+            <div id="modal-warning" class="modal-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <span id="modal-warning-text"></span>
+            </div>
+            <div class="modal-textarea-container">
+                <textarea id="bulk-actions-textarea" class="modal-textarea" readonly placeholder="Click a button above to populate this area..."></textarea>
+                <button id="modal-copy-btn" class="modal-copy-btn" onclick="copyFromModal()">
+                    <i class="bi bi-clipboard"></i> Copy
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Keyboard Shortcuts Help Modal -->
+    <div class="modal fade" id="help-modal" tabindex="-1" aria-labelledby="help-modal-label" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="help-modal-label">
+                        <i class="bi bi-keyboard"></i> Keyboard Shortcuts
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="shortcut-section">
+                        <h6><i class="bi bi-gear"></i> Interface</h6>
+                        <div class="shortcut-item">
+                            <kbd>?</kbd> <span>Show this help modal</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Escape</kbd> <span>Close dialogs</span>
+                        </div>
+                    </div>
+
+                    <div class="shortcut-section">
+                        <h6><i class="bi bi-keyboard"></i> Navigation</h6>
+                        <div class="shortcut-item">
+                            <kbd>↑</kbd> / <kbd>k</kbd> <span>Navigate up</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>↓</kbd> / <kbd>j</kbd> <span>Navigate down</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Enter</kbd> <span>Open game</span>
+                        </div>
+                    </div>
+
+                    <div class="shortcut-section">
+                        <h6><i class="bi bi-mouse"></i> Mouse</h6>
+                        <div class="shortcut-item">
+                            <span class="mouse-action">Left-click</span> <span>Select game</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="mouse-action">Middle-click</span> <span>Open game in new tab</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <span class="mouse-action">Ctrl+click</span> <span>Open game in new tab</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/picker.js') }}"></script>
+</body>
+</html>

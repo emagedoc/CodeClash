@@ -1,0 +1,27 @@
+<header class="header">
+    <div class="header-content">
+        <div class="header-title-section">
+            <h1>CodeClash Trajectory Viewer</h1>
+            <div class="header-links">
+                <a href="https://github.com/emagedoc/codeclash" target="_blank" rel="noopener noreferrer" class="header-link">GitHub</a>
+            </div>
+        </div>
+
+        <div class="controls">
+            {% if not is_static %}
+            <!-- Batch Monitor Button -->
+            <div class="control-group">
+                <a href="{{ url_for('batch_monitor') }}" class="btn btn-outline-primary" title="View AWS Batch Jobs">
+                    <i class="bi bi-cloud"></i> Batch Monitor
+                </a>
+            </div>
+            {% endif %}
+            <!-- Help Button -->
+            <div class="control-group">
+                <button id="help-btn" class="btn btn-outline-secondary help-button" title="Show Keyboard Shortcuts (Press ?)">
+                    <i class="bi bi-question-circle"></i> <kbd>?</kbd>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>

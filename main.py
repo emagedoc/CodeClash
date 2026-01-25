@@ -1,0 +1,105 @@
+import argparse
+import getpass
+import random
+import time
+import uuid
+from pathlib import Path
+
+import yaml
+
+from codeclash import CONFIG_DIR
+from codeclash.constants import LOCAL_LOG_DIR
+from codeclash.tournaments.pvp import PvpTournament
+from codeclash.utils.aws import is_running_in_aws_batch
+from codeclash.utils.yaml_utils import resolve_includes
+
+
+def main(
+    config_path: Path,
+    *,
+    cleanup: bool = False,
+    output_dir: Path | None = None,
+    suffix: str = "",
+    keep_containers: bool = False,
+):
+    yaml_content = config_path.read_text()
+    preprocessed_yaml = resolve_includes(yaml_content, base_dir=CONFIG_DIR)
+    config = yaml.safe_load(preprocessed_yaml)
+
+    def get_output_path() -> Path:
+        if is_running_in_aws_batch():
+            # Offset timestamp by random seconds to avoid collisions
+            # Hopefully that means we can just remove the uuid part later on
+            offset = random.randint(0, 600)
+            timestamp = time.strftime("%y%m%d%H%M%S", time.localtime(time.time() + offset))
+        else:
+            timestamp = time.strftime("%y%m%d%H%M%S")
+        rounds = config["tournament"]["rounds"]
+        transparent = config["tournament"].get("transparent", False)
+        sims = config["game"]["sims_per_round"]
+
+        players = [p["name"] for p in config["players"]]
+        p_num = len(players)
+        p_list = ".".join(sorted(players))
+        suffix_part = f".{suffix}" if suffix else ""
+        folder_name = (
+            f"PvpTournament.{config['game']['name']}.r{rounds}.s{sims}.p{p_num}.{p_list}{suffix_part}.{timestamp}"
+        )
+        if transparent:
+            folder_name += ".transparent"
+        if is_running_in_aws_batch():
+            # Also add a UUID just to be safe
+            _uuid = str(uuid.uuid4())
+            folder_name += f".{_uuid}-uuid"
+        if output_dir is None:
+            if is_running_in_aws_batch():
+                return LOCAL_LOG_DIR / "batch" / folder_name
+            else:
+                return LOCAL_LOG_DIR / getpass.getuser() / folder_name
+        else:
+            return output_dir / folder_name
+
+    full_output_dir = get_output_path()
+
+    tournament = PvpTournament(config, output_dir=full_output_dir, cleanup=cleanup, keep_containers=keep_containers)
+    tournament.run()
+
+
+def main_cli(argv: list[str] | None = None):
+    parser = argparse.ArgumentParser(description="CodeClash")
+    parser.add_argument(
+        "config_path",
+        type=Path,
+        help="Path to the config file.",
+    )
+    parser.add_argument(
+        "-c",
+        "--cleanup",
+        action="store_true",
+        help="If set, do not clean up the game environment after running.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-dir",
+        type=Path,
+        help="Sets the output directory (default is 'logs' with current user subdirectory).",
+    )
+    parser.add_argument(
+        "-s",
+        "--suffix",
+        type=str,
+        help="Suffix to attach to the folder name. Does not include leading dot or underscore.",
+        default="",
+    )
+    parser.add_argument(
+        "-k",
+        "--keep-containers",
+        action="store_true",
+        help="Do not remove containers after games/agent finish",
+    )
+    args = parser.parse_args(argv)
+    main(**vars(args))
+
+
+if __name__ == "__main__":
+    main_cli()

@@ -1,0 +1,65 @@
+<!-- Rounds Section -->
+<section class="rounds-section">
+    <h2><i class="bi bi-flag"></i> Rounds</h2>
+
+    {% for round_data in metadata.rounds %}
+        {% set round_num = round_data.round_num %}
+
+        <!-- Round Anchor for Navigation -->
+        <div id="round-{{ round_num }}" class="round-anchor"></div>
+
+        <!-- Player Trajectories for this round (skip round 0 - warmup only) -->
+        {% if round_num > 0 and round_num in trajectories_by_round %}
+            {% for trajectory in trajectories_by_round[round_num] %}
+                {% include 'includes/trajectory.html' %}
+            {% endfor %}
+        {% endif %}
+
+
+        <!-- Round Results (if available) -->
+        {% if round_data.results %}
+        <details class="foldout round-foldout">
+            <summary>
+                <i class="bi bi-trophy"></i> Round {{ round_num }} Results
+                {% if round_data.results.winner and round_data.results.scores %}
+                    {%- set total_games = round_data.results.scores.values() | sum -%}
+                    {%- set winner = round_data.results.winner -%}
+                    {%- if winner != 'Tie' and total_games > 0 -%}
+                        {%- set winner_wins = round_data.results.scores.get(winner, 0) -%}
+                        {%- set ties = round_data.results.scores.get('Tie', 0) -%}
+                        {%- set win_percentage = ((winner_wins + 0.5 * ties) / total_games * 100) | round(1) -%}
+                        - Winner: {{ winner }} with {{ win_percentage }}%
+                        {%- if round_data.results.p_value is not none %} (p={{ "%.2f"|format(round_data.results.p_value) }}){% endif %} (
+                        {%- for player, score in round_data.results.scores.items() -%}
+                            {{- score -}}
+                            {%- if not loop.last -%}-{%- endif -%}
+                        {%- endfor -%})
+                    {%- elif winner == 'Tie' and total_games > 0 -%}
+                        - Winner: Tie
+                        {%- if round_data.results.p_value is not none %} (p={{ "%.2f"|format(round_data.results.p_value) }}){% endif %} (
+                        {%- for player, score in round_data.results.scores.items() -%}
+                            {{- score -}}
+                            {%- if not loop.last -%}-{%- endif -%}
+                        {%- endfor -%})
+                    {%- else -%}
+                        - No games played yet (
+                        {%- for player, score in round_data.results.scores.items() -%}
+                            {{- score -}}
+                            {%- if not loop.last -%}-{%- endif -%}
+                        {%- endfor -%})
+                    {% endif %}
+                {% endif %}
+            </summary>
+            <div class="log-content">
+                <div id="round-{{ round_num }}-results-jsoneditor" class="json-viewer"></div>
+            </div>
+        </details>
+        {% endif %}
+
+        <!-- Round separator (except after the last round) -->
+        {% if not loop.last %}
+        <div class="round-separator"></div>
+        {% endif %}
+
+    {% endfor %}
+</section>
