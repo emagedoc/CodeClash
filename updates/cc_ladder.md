@@ -1,7 +1,6 @@
-title: Humans & AI [Ep. 2] - Introducing CC:Ladder
-date: 2026-01-15
-description: Where does AI rank among public solutions by human programmers?
-authors: Anonymous
+# Humans & AI [Ep. 2] - Introducing CC:Ladder
+
+*January 15, 2026* · Where does AI rank among public solutions by human programmers?
 
 **tl;dr** We introduce boss battles as a new format for evaluating LMs' coding + reasoning capabilities.
 

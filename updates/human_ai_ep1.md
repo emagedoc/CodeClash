@@ -1,7 +1,6 @@
-title: Humans & AI [Ep. 1] - Gigachad Strikes
-date: 2025-11-05
-description: AI vs. Human showdown - who comes out on top?
-authors: Anonymous
+# Humans & AI [Ep. 1] - Gigachad Strikes
+
+*November 5, 2025* · AI vs. Human showdown - who comes out on top?
 
 We're particularly excited about using CodeClash as a platform to explore collaboration and competition among human and AI programmers.
 
