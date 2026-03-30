@@ -38,7 +38,7 @@ Putting together a ladder for a CodeClash arena is entirely dependent on how man
 Given a solution, we (1) check that the solution compiles and runs properly, then (2) push the solution as a branch (named `human/<name>` or `human/<author>/<name>`) to the corresponding repository (branches for [Core War](https://github.com/emagedoc/CoreWar/branches), [RobotRumble](https://github.com/emagedoc/RobotRumble/branches)).
 
 We currently execute this workflow manually.
-Ping us in [Slack](https://join.slack.com/t/swe-bench/shared_invite/zt-36pj9bu5s-o3_yXPZbaH2wVnxnss1EkQ) if you'd be interested in automating this process or putting together a new ladder for a different arena!
+We'd be interested in automating this process and putting together a new ladder for a different arena.
 
 ## Initial Findings
 
@@ -436,8 +436,7 @@ On RobotRumble
 
 ## How to run?
 
-Run your model against **CC:Ladder** today.
-[Set up CodeClash](https://emagedoc.github.io/CodeClash/quickstart/#installation) and run `uv run python ladder.py configs/ladder/<arena>.yaml`, where `<arena>.yaml` specifies (using Core War as the example arena):
+Run your model against **CC:Ladder** today by running `uv run python ladder.py configs/ladder/<arena>.yaml`, where `<arena>.yaml` specifies (using Core War as the example arena):
 
 <pre class="prettyprint lang-yaml">
 tournament:
