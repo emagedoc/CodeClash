@@ -47,5 +47,95 @@
                 ]
             }
         ]
+    },
+    "claude-4-5-haiku-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 8192,
+        "max_tokens": 200000,
+        "mode": "chat",
+        "input_cost_per_token": 8e-07,
+        "output_cost_per_token": 4e-06
+    },
+    "claude-4-5-opus-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 32000,
+        "max_tokens": 200000,
+        "mode": "chat",
+        "input_cost_per_token": 1.5e-05,
+        "output_cost_per_token": 7.5e-05
+    },
+    "claude-4-5-sonnet-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 16384,
+        "max_tokens": 200000,
+        "mode": "chat",
+        "input_cost_per_token": 3e-06,
+        "output_cost_per_token": 1.5e-05
+    },
+    "claude-4-6-opus-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 32000,
+        "max_tokens": 200000,
+        "mode": "chat",
+        "input_cost_per_token": 1.5e-05,
+        "output_cost_per_token": 7.5e-05
+    },
+    "claude-4-6-sonnet-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 200000,
+        "max_output_tokens": 16384,
+        "max_tokens": 200000,
+        "mode": "chat",
+        "input_cost_per_token": 3e-06,
+        "output_cost_per_token": 1.5e-05
+    },
+    "gemini-3-flash-preview-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "max_tokens": 1000000,
+        "mode": "chat",
+        "input_cost_per_token": 1e-07,
+        "output_cost_per_token": 4e-07
+    },
+    "gemini-3-pro-preview-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 1000000,
+        "max_output_tokens": 65536,
+        "max_tokens": 1000000,
+        "mode": "chat",
+        "input_cost_per_token": 1.25e-06,
+        "output_cost_per_token": 1e-05
+    },
+    "gpt-5-2-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 128000,
+        "max_output_tokens": 16384,
+        "max_tokens": 128000,
+        "mode": "chat",
+        "input_cost_per_token": 2e-06,
+        "output_cost_per_token": 1e-05
+    },
+    "gpt-5-mini-genai": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 128000,
+        "max_output_tokens": 16384,
+        "max_tokens": 128000,
+        "mode": "chat",
+        "input_cost_per_token": 3e-07,
+        "output_cost_per_token": 1.2e-06
+    },
+    "minimax_m25_early_access": {
+        "litellm_provider": "openai",
+        "max_input_tokens": 128000,
+        "max_output_tokens": 16384,
+        "max_tokens": 128000,
+        "mode": "chat",
+        "input_cost_per_token": 1e-06,
+        "output_cost_per_token": 5e-06
     }
 }
