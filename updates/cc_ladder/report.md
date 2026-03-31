@@ -1,8 +1,10 @@
 # Humans & AI [Ep. 2] - Introducing CC:Ladder
 
-*January 15, 2026* · Where does AI rank among public solutions by human programmers?
+Where does AI rank among public solutions by human programmers?
 
-**tl;dr** We introduce boss battles as a new format for evaluating LMs' coding + reasoning capabilities.
+**tl;dr** Inspired by our original human vs. AI comparison (Section 4.1), we scale the evaluation to many more human solutions. In CodeClash Ladders, models climb a ranked ladder of human expert solutions, advancing only when they defeat the current opponent. We construct ladders for RobotRumble (58 human solutions) and Core War (264 human solutions), ranked by Elo from all-pairs matchups. The strongest model, Claude Sonnet 4.6, only reaches rank 39/58 on RobotRumble and 177/264 on Core War, confirming a substantial gap between current models and human experts.
+
+---
 
 We pit [Claude 4.5 Sonnet against <img src="images/gigachad.jpg" class="img-inline" style="height:1.2rem;margin-right:0em;" /> GigaChad](#) in [RobotRumble](#robotrumble) and found that today's best coding models still struggle heavily to develop suboptimal codebases into ones that rival the best human written solutions.
 
