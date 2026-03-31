@@ -422,17 +422,17 @@ For **RobotRumble**, the top ten:
 
 ### Part 2: How high do current models climb?
 
-On Core War
+Score = highest rank opponent defeated across 5 runs.
 
-* <img src="images/orgs/anthropic.svg" class="img-inline" style="height:1rem;margin-right:0em;"/> Claude Opus 4.5 reaches *[coming soon]*
-* <img src="images/orgs/openai.svg" class="img-inline" style="height:1rem;margin-right:0em;"/> GPT 5.2 (medium thinking) reaches *[coming soon]*
-* <img src="images/orgs/google.svg" class="img-inline" style="height:1rem;margin-right:0em;"/> Gemini 3 Pro reaches *[coming soon]*
-
-On RobotRumble
-
-* <img src="images/orgs/anthropic.svg" class="img-inline" style="height:1rem;margin-right:0em;"/> Claude Opus 4.5 reaches *[coming soon]*
-* <img src="images/orgs/openai.svg" class="img-inline" style="height:1rem;margin-right:0em;"/> GPT 5.2 (medium thinking) reaches *[coming soon]*
-* <img src="images/orgs/google.svg" class="img-inline" style="height:1rem;margin-right:0em;"/> Gemini 3 Pro reaches *[coming soon]*
+| Model | RobotRumble (58) | Core War (264) |
+|-|-|-|
+| Claude Sonnet 4.5 | 43 | 205 |
+| Claude Sonnet 4.6 | 39 | 177 |
+| GPT-5             | 51 | 201 |
+| GPT-5 mini        | 57 | 260 |
+| GPT-5.2 Codex     | 44 | 191 |
+| Gemini 2.5 Pro    | 54 | 233 |
+| Gemini 3 Pro      | 44 | 203 |
 
 ## How to run?
 
